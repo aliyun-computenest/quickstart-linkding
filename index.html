@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="计算巢是阿里云开放给企业应用服务商的服务管理平台。服务商能够在计算巢上发布私有化部署服务，为其客户提供云上软件一键部署的能力；同时也支持全托管模式的服务，赋能服务商托管其客户资源。">
+  <title>中文 - Aliyun 计算巢 x Linkding</title>
+
+  <link rel="shortcut icon" href="img/favicon.ico">
+
+  <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css">
+  <link rel="stylesheet" href="css/theme.css">
+  
+
+  
+
+  
+  
+
+  
+    <script src="search/main.js"></script>
+  
+
+  
+
+  <script src="js/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="nav">
+      <div class="nav-inner">
+        <div class="logo">
+          <img src="./img/logo-2x.png">
+        </div>
+        <div class="nav-list">
+          <ul>
+          
+              <li><a href="#linkding">Linkding 计算巢部署文档</a></li>
+              
+                  <li><a href="#_1">服务说明</a></li>
+                  
+              
+                  <li><a href="#_2">计费说明</a></li>
+                  
+              
+                  <li><a href="#ram">RAM账号所需权限</a></li>
+                  
+              
+                  <li><a href="#_3">服务实例部署流程</a></li>
+                  
+                      <li class="li-h3"><a href="#_4">部署步骤</a></li>
+                  
+              
+                  <li><a href="#_5">首次使用说明</a></li>
+                  
+                      <li class="li-h3"><a href="#1">1. 添加第一条书签</a></li>
+                  
+                      <li class="li-h3"><a href="#2">2. 导入浏览器收藏夹</a></li>
+                  
+                      <li class="li-h3"><a href="#3">3. 数据持久化</a></li>
+                  
+                      <li class="li-h3"><a href="#4">4. 修改管理员密码</a></li>
+                  
+                      <li class="li-h3"><a href="#5">5. 修改运行参数</a></li>
+                  
+              
+                  <li><a href="#_6">参数说明</a></li>
+                  
+              
+                  <li><a href="#_7">输出说明</a></li>
+                  
+              
+                  <li><a href="#_8">安全与使用说明</a></li>
+                  
+              
+                  <li><a href="#_9">常见问题</a></li>
+                  
+              
+                  <li><a href="#_10">官方链接</a></li>
+                  
+              
+          
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="content theme-github">
+      
+      <div class="content-inner">        
+        
+        <h1 id="linkding">Linkding 计算巢部署文档</h1>
+<h2 id="_1">服务说明</h2>
+<p>Linkding 是一款 MIT 许可开源自托管的书签管理器：把浏览器收藏夹搬到自己的服务器上，用标签、关键词和分面组合检索，几十万条书签也不会卡；支持导入浏览器导出的收藏夹文件、提供 REST API 与浏览器扩展，书签数据保存在实例本机的 SQLite 数据库里，不依赖任何第三方在线服务。</p>
+<p>本计算巢服务采用单机 ECS 部署，ECS 镜像内已预置 Linkding 与 Docker Compose 运行环境，数据全部保存在实例本机。</p>
+<p>访问入口为实例公网 IP 的 9090 端口。打开地址会跳转到书签页并要求登录，用户名固定为 <code>admin</code>，初始密码在服务实例输出中查看。</p>
+<h2 id="_2">计费说明</h2>
+<p>通过此服务模板构建服务不产生费用。用户部署服务实例时，资源费用主要涉及：</p>
+<ul>
+<li>ECS 实例规格（最低 2 vCPU、4 GiB 内存）</li>
+<li>系统盘容量（模板固定 200 GiB ESSD）</li>
+<li>公网带宽（模板固定 5 Mbps）</li>
+</ul>
+<p>计费方式支持按量付费和包年包月，预估费用会在部署前实时展示。</p>
+<h2 id="ram">RAM账号所需权限</h2>
+<p>若使用 RAM 用户创建服务实例，需要在创建服务实例前为该 RAM 用户添加相应权限。</p>
+<table>
+<thead>
+<tr>
+<th>权限策略名称</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AliyunECSFullAccess</td>
+<td>管理云服务器 ECS 的权限</td>
+</tr>
+<tr>
+<td>AliyunVPCFullAccess</td>
+<td>管理专有网络 VPC 的权限</td>
+</tr>
+<tr>
+<td>AliyunROSFullAccess</td>
+<td>管理资源编排 ROS 的权限</td>
+</tr>
+<tr>
+<td>AliyunComputeNestUserFullAccess</td>
+<td>管理计算巢服务用户侧资源的权限</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_3">服务实例部署流程</h2>
+<h3 id="_4">部署步骤</h3>
+<ol>
+<li>打开计算巢服务实例创建页面，选择部署地域，填写实例规格、实例密码。网络可选择新建 VPC，也可以选择已有的 VPC 与交换机。</li>
+</ol>
+<p><a href="https://computenest.console.aliyun.com/service/instance/create/cn-hangzhou?type=user&amp;ServiceId=service-a4f92262ea104a239fe6">部署链接</a></p>
+<p><img alt="创建服务实例" src="create-instance.png" /></p>
+<ol>
+<li>
+<p>确认询价明细后点击 <strong>下一步：确认订单</strong>，同意服务协议并点击 <strong>立即创建</strong>。</p>
+</li>
+<li>
+<p>等待服务实例部署完成。部署完成后，在服务实例详情页的 <strong>输出</strong> 区域查看 <code>linkding_9090_url</code> 访问地址与管理员密码。</p>
+</li>
+<li>
+<p>用浏览器打开输出中的访问地址（<code>http://&lt;实例公网IP&gt;:9090</code>），使用用户名 <code>admin</code> 与输出中的管理员密码登录，通过 <strong>Add bookmark</strong> 保存第一条书签。</p>
+</li>
+</ol>
+<p><img alt="Linkding 书签页" src="app.png" /></p>
+<h2 id="_5">首次使用说明</h2>
+<h3 id="1">1. 添加第一条书签</h3>
+<p>登录后在书签列表顶部的 URL 输入框粘贴地址并保存即可；也可以在详情页补充标题、描述与标签。标签支持 <code>+</code> 组合与排除语法，用于在列表里做分面检索。</p>
+<h3 id="2">2. 导入浏览器收藏夹</h3>
+<p>在设置页使用「Import」导入浏览器导出的书签 HTML 文件，也可以在实例内使用 <code>manage.py</code> 批量操作。导入过程只在本机执行，不会把书签发送到外部服务。</p>
+<h3 id="3">3. 数据持久化</h3>
+<p>书签与账号数据保存在实例系统盘的 <code>/opt/linkding/data</code> 目录（SQLite 数据库 <code>db.sqlite3</code>、assets、favicons、previews 与 <code>secretkey.txt</code>），执行 <code>docker compose down</code> 或重启实例不会丢数据；释放实例即全部丢失，请定期备份该目录。</p>
+<h3 id="4">4. 修改管理员密码</h3>
+<p>初始密码只在首次启动创建账号时生效，之后修改 <code>.env</code> 里的密码不会改变已有账号。如需改密，登录后进入 Settings 页点击 Change password，或登录实例执行 <code>cd /opt/linkding &amp;&amp; docker compose exec linkding python manage.py changepassword admin</code>。</p>
+<h3 id="5">5. 修改运行参数</h3>
+<p>登录实例编辑 <code>/opt/linkding/.env</code>，然后执行 <code>cd /opt/linkding &amp;&amp; docker compose up -d</code> 生效；<code>.env</code> 中的键值会以环境变量方式注入容器。</p>
+<h2 id="_6">参数说明</h2>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+<th>默认值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VpcOption</td>
+<td>网络类型，新建 VPC 或使用已有 VPC</td>
+<td>NewVPC</td>
+</tr>
+<tr>
+<td>VpcCidrBlock</td>
+<td>新建 VPC 的网段</td>
+<td>192.168.0.0/16</td>
+</tr>
+<tr>
+<td>VSwitchCidrBlock</td>
+<td>新建交换机的网段</td>
+<td>192.168.1.0/24</td>
+</tr>
+<tr>
+<td>EcsInstanceType</td>
+<td>ECS 实例规格，最低 2 vCPU 4 GiB</td>
+<td>无</td>
+</tr>
+<tr>
+<td>InstancePassword</td>
+<td>实例登录密码</td>
+<td>无</td>
+</tr>
+<tr>
+<td>PayType</td>
+<td>付费类型</td>
+<td>PostPaid</td>
+</tr>
+<tr>
+<td>ZoneId</td>
+<td>可用区</td>
+<td>无</td>
+</tr>
+<tr>
+<td>VpcId / VSwitchId</td>
+<td>已有 VPC 与交换机 ID（选择已有 VPC 时填写）</td>
+<td>空</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_7">输出说明</h2>
+<table>
+<thead>
+<tr>
+<th>输出</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>linkding_9090_url</td>
+<td>Linkding 访问地址（端口 9090）</td>
+</tr>
+<tr>
+<td>AdminUsername</td>
+<td>管理员用户名（admin）</td>
+</tr>
+<tr>
+<td>AdminPassword</td>
+<td>系统随机生成的管理员密码</td>
+</tr>
+<tr>
+<td>DataPersistenceNote</td>
+<td>数据目录与备份说明</td>
+</tr>
+<tr>
+<td>MetadataFetchNote</td>
+<td>网页标题与图标抓取说明</td>
+</tr>
+<tr>
+<td>SnapshotNote</td>
+<td>网页快照能力说明</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_8">安全与使用说明</h2>
+<ul>
+<li>抓取网页标题、图标与预览图需要实例具备公网出口；抓取境外站点失败只影响展示效果，不影响书签保存。如不需要，可设置 <code>LD_DISABLE_BACKGROUND_TASKS=True</code> 关闭后台任务。</li>
+<li>内网地址默认被 SSRF 防护拦截；如需保存内网书签，通过 <code>LD_ALLOWED_INTERNAL_HOSTS</code> 放行对应主机。</li>
+<li>当前交付的是基础镜像，不包含服务端自动生成网页快照的能力；如需保存网页存档，可在浏览器安装 SingleFile 扩展，把快照上传到 <code>/api/bookmarks/singlefile/</code> 接口，REST API 令牌可在登录后的 Settings 页生成。</li>
+<li>所有数据保存在系统盘 <code>/opt/linkding/data</code>，释放服务实例会一并删除，请提前备份。</li>
+</ul>
+<h2 id="_9">常见问题</h2>
+<p><strong>登录提示用户名或密码错误？</strong>
+用户名固定为 <code>admin</code>，密码在服务实例输出的 <code>AdminPassword</code> 中；如果改过密码，请使用修改后的密码。</p>
+<p><strong>书签保存后没有标题和图标？</strong>
+标题与图标由后台任务抓取，需要实例能访问外网；抓取失败不影响书签本身，可以稍后手动编辑补充。</p>
+<p><strong>需要给其他系统开放 API？</strong>
+在 Settings 页生成 REST API 令牌，调用方以 <code>Authorization: Token &lt;令牌&gt;</code> 访问 <code>/api/bookmarks/</code> 等接口。</p>
+<h2 id="_10">官方链接</h2>
+<ul>
+<li>官方仓库：https://github.com/sissbruecker/linkding</li>
+<li>官方文档：https://linkding.link/</li>
+<li>许可证：MIT</li>
+</ul>
+        
+      </div>
+
+      <div class="copyrights">© 2009-2022 Aliyun.com 版权所有</div>
+    </div>
+  </div>
+  
+  <!--
+  MkDocs version      : 1.6.1
+  Docs Build Date UTC : 2026-11-25 09:52:35.548515+00:00
+  -->
+</body>
+</html>

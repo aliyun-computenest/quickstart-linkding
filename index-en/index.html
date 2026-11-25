@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="计算巢是阿里云开放给企业应用服务商的服务管理平台。服务商能够在计算巢上发布私有化部署服务，为其客户提供云上软件一键部署的能力；同时也支持全托管模式的服务，赋能服务商托管其客户资源。">
+  <title>English - Aliyun 计算巢 x Linkding</title>
+
+  <link rel="shortcut icon" href="../img/favicon.ico">
+
+  <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css">
+  <link rel="stylesheet" href="../css/theme.css">
+  
+
+  
+
+  
+  
+
+  
+    <script src="../search/main.js"></script>
+  
+
+  
+
+  <script src="../js/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="nav">
+      <div class="nav-inner">
+        <div class="logo">
+          <img src="./img/logo-2x.png">
+        </div>
+        <div class="nav-list">
+          <ul>
+          
+              <li><a href="#deploying-linkding-on-alibaba-cloud-compute-nest">Deploying Linkding on Alibaba Cloud Compute Nest</a></li>
+              
+                  <li><a href="#about-the-service">About the service</a></li>
+                  
+              
+                  <li><a href="#billing">Billing</a></li>
+                  
+              
+                  <li><a href="#required-ram-permissions">Required RAM permissions</a></li>
+                  
+              
+                  <li><a href="#deployment-steps">Deployment steps</a></li>
+                  
+              
+                  <li><a href="#first-steps">First steps</a></li>
+                  
+                      <li class="li-h3"><a href="#add-your-first-bookmark">Add your first bookmark</a></li>
+                  
+                      <li class="li-h3"><a href="#import-browser-bookmarks">Import browser bookmarks</a></li>
+                  
+                      <li class="li-h3"><a href="#data-persistence">Data persistence</a></li>
+                  
+                      <li class="li-h3"><a href="#change-the-admin-password">Change the admin password</a></li>
+                  
+                      <li class="li-h3"><a href="#change-runtime-settings">Change runtime settings</a></li>
+                  
+              
+                  <li><a href="#parameters">Parameters</a></li>
+                  
+              
+                  <li><a href="#outputs">Outputs</a></li>
+                  
+              
+                  <li><a href="#security-notes">Security notes</a></li>
+                  
+              
+                  <li><a href="#troubleshooting">Troubleshooting</a></li>
+                  
+              
+                  <li><a href="#links">Links</a></li>
+                  
+              
+          
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="content theme-github">
+      
+      <div class="content-inner">        
+        
+        <h1 id="deploying-linkding-on-alibaba-cloud-compute-nest">Deploying Linkding on Alibaba Cloud Compute Nest</h1>
+<h2 id="about-the-service">About the service</h2>
+<p>Linkding is an MIT-licensed, self-hosted bookmark manager. It moves your browser bookmarks onto your own server, where tags, keyword search and faceted filters stay fast even with hundreds of thousands of bookmarks. It imports browser bookmark exports, ships a REST API and browser extensions, and keeps everything in a local SQLite database without relying on any third-party online service.</p>
+<p>This Compute Nest service deploys a single ECS instance. The image already contains Linkding and its Docker Compose runtime, and all data stays on the instance.</p>
+<p>Linkding is served on port 9090 of the instance public IP. Opening the address redirects to the bookmark list and requires sign-in. The username is always <code>admin</code>; the initial password is listed in the service instance outputs.</p>
+<h2 id="billing">Billing</h2>
+<p>Creating a service from this template is free. Running a service instance incurs:</p>
+<ul>
+<li>ECS instance (minimum 2 vCPU, 4 GiB memory)</li>
+<li>System disk (fixed at 200 GiB ESSD by the template)</li>
+<li>Public bandwidth (fixed at 5 Mbps by the template)</li>
+</ul>
+<p>Both pay-as-you-go and subscription are supported; the estimate is shown before you confirm the order.</p>
+<h2 id="required-ram-permissions">Required RAM permissions</h2>
+<p>If you create the instance with a RAM user, grant the following policies first.</p>
+<table>
+<thead>
+<tr>
+<th>Policy</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AliyunECSFullAccess</td>
+<td>Manage ECS instances</td>
+</tr>
+<tr>
+<td>AliyunVPCFullAccess</td>
+<td>Manage VPC resources</td>
+</tr>
+<tr>
+<td>AliyunROSFullAccess</td>
+<td>Manage Resource Orchestration Service stacks</td>
+</tr>
+<tr>
+<td>AliyunComputeNestUserFullAccess</td>
+<td>Manage Compute Nest user-side resources</td>
+</tr>
+</tbody>
+</table>
+<h2 id="deployment-steps">Deployment steps</h2>
+<ol>
+<li>Open the instance creation page, choose a region, and specify the instance type and instance password. You can create a new VPC or use an existing VPC and vSwitch.</li>
+</ol>
+<p><a href="https://computenest.console.aliyun.com/service/instance/create/cn-hangzhou?type=user&amp;ServiceId=service-a4f92262ea104a239fe6">Deploy now</a></p>
+<p><img alt="Create a service instance" src="../create-instance.png" /></p>
+<ol>
+<li>
+<p>Review the price estimate, choose <strong>Next: Confirm Order</strong>, accept the service agreement and click <strong>Create Now</strong>.</p>
+</li>
+<li>
+<p>Wait for the deployment to finish. The <strong>Outputs</strong> section of the instance details page lists <code>linkding_9090_url</code> and the admin password.</p>
+</li>
+<li>
+<p>Open the URL from the outputs (<code>http://&lt;public-ip&gt;:9090</code>), sign in as <code>admin</code> with the generated password, and use <strong>Add bookmark</strong> to save your first link.</p>
+</li>
+</ol>
+<p><img alt="Linkding bookmark list" src="../app.png" /></p>
+<h2 id="first-steps">First steps</h2>
+<h3 id="add-your-first-bookmark">Add your first bookmark</h3>
+<p>Paste a URL into the input at the top of the bookmark list and save. You can add a title, description and tags on the details page. Tags support <code>+</code> combinations and exclusions for faceted filtering.</p>
+<h3 id="import-browser-bookmarks">Import browser bookmarks</h3>
+<p>Use <strong>Import</strong> on the settings page with the HTML file your browser exported, or run <code>manage.py</code> on the instance for bulk operations. Everything stays on the instance.</p>
+<h3 id="data-persistence">Data persistence</h3>
+<p>Bookmarks and accounts live under <code>/opt/linkding/data</code> on the system disk (<code>db.sqlite3</code>, assets, favicons, previews and <code>secretkey.txt</code>). <code>docker compose down</code> and instance restarts keep the data; releasing the instance deletes it, so back up that directory regularly.</p>
+<h3 id="change-the-admin-password">Change the admin password</h3>
+<p>The initial password only applies when the account is first created; editing the password in <code>.env</code> later does not change an existing account. Open Settings → Change password in the UI, or run <code>cd /opt/linkding &amp;&amp; docker compose exec linkding python manage.py changepassword admin</code> on the instance.</p>
+<h3 id="change-runtime-settings">Change runtime settings</h3>
+<p>Edit <code>/opt/linkding/.env</code> on the instance and run <code>cd /opt/linkding &amp;&amp; docker compose up -d</code>. Values in <code>.env</code> are injected into the container as environment variables.</p>
+<h2 id="parameters">Parameters</h2>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VpcOption</td>
+<td>Create a new VPC or reuse an existing one</td>
+<td>NewVPC</td>
+</tr>
+<tr>
+<td>VpcCidrBlock</td>
+<td>CIDR block of the new VPC</td>
+<td>192.168.0.0/16</td>
+</tr>
+<tr>
+<td>VSwitchCidrBlock</td>
+<td>CIDR block of the new vSwitch</td>
+<td>192.168.1.0/24</td>
+</tr>
+<tr>
+<td>EcsInstanceType</td>
+<td>ECS instance type, at least 2 vCPU / 4 GiB</td>
+<td>none</td>
+</tr>
+<tr>
+<td>InstancePassword</td>
+<td>Password for the ECS instance</td>
+<td>none</td>
+</tr>
+<tr>
+<td>PayType</td>
+<td>Billing method</td>
+<td>PostPaid</td>
+</tr>
+<tr>
+<td>ZoneId</td>
+<td>Availability zone</td>
+<td>none</td>
+</tr>
+<tr>
+<td>VpcId / VSwitchId</td>
+<td>Existing VPC and vSwitch (when reusing a VPC)</td>
+<td>empty</td>
+</tr>
+</tbody>
+</table>
+<h2 id="outputs">Outputs</h2>
+<table>
+<thead>
+<tr>
+<th>Output</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>linkding_9090_url</td>
+<td>Linkding URL (port 9090)</td>
+</tr>
+<tr>
+<td>AdminUsername</td>
+<td>Admin username (<code>admin</code>)</td>
+</tr>
+<tr>
+<td>AdminPassword</td>
+<td>Generated admin password</td>
+</tr>
+<tr>
+<td>DataPersistenceNote</td>
+<td>Data directory and backup notes</td>
+</tr>
+<tr>
+<td>MetadataFetchNote</td>
+<td>Notes on page title and icon fetching</td>
+</tr>
+<tr>
+<td>SnapshotNote</td>
+<td>Notes on web snapshot support</td>
+</tr>
+</tbody>
+</table>
+<h2 id="security-notes">Security notes</h2>
+<ul>
+<li>Fetching page titles, icons and previews requires outbound internet access. Failures for overseas sites only affect presentation, not saving. Set <code>LD_DISABLE_BACKGROUND_TASKS=True</code> to turn background tasks off.</li>
+<li>Internal addresses are blocked by SSRF protection by default; allow specific hosts with <code>LD_ALLOWED_INTERNAL_HOSTS</code> if you need internal bookmarks.</li>
+<li>The delivered image does not generate server-side web snapshots. Install the SingleFile browser extension and upload snapshots to <code>/api/bookmarks/singlefile/</code>; generate a REST API token on the settings page.</li>
+<li>All data lives under <code>/opt/linkding/data</code> on the system disk and is deleted with the instance.</li>
+</ul>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<p><strong>Sign-in says the username or password is wrong.</strong> The username is <code>admin</code> and the password is the <code>AdminPassword</code> output value (or the password you changed it to).</p>
+<p><strong>Bookmarks have no title or icon.</strong> Titles and icons are fetched by background tasks and need outbound access. Failures do not affect the bookmark itself; edit it manually to fill them in.</p>
+<p><strong>Expose the API to another system.</strong> Generate a REST API token on the settings page and call <code>/api/bookmarks/</code> with <code>Authorization: Token &lt;token&gt;</code>.</p>
+<h2 id="links">Links</h2>
+<ul>
+<li>Source code: https://github.com/sissbruecker/linkding</li>
+<li>Documentation: https://linkding.link/</li>
+<li>License: MIT</li>
+</ul>
+        
+      </div>
+
+      <div class="copyrights">© 2009-2022 Aliyun.com 版权所有</div>
+    </div>
+  </div>
+  
+  <!--
+  MkDocs version      : 1.6.1
+  Docs Build Date UTC : 2026-11-25 09:52:35.631961+00:00
+  -->
+</body>
+</html>
